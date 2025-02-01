@@ -10,6 +10,7 @@ export interface CarModel {
   brand: string;
   year: number;
   type: string;
+  thumbnail: string;
 }
 
 export const carBrands: CarBrand[] = [
@@ -42,6 +43,7 @@ export const popularModels: CarModel[] = [
     brand: "Porsche",
     year: 2023,
     type: "Sports Car",
+    thumbnail: "https://images.unsplash.com/photo-1611859266238-4b98091d9d9b?auto=format&fit=crop&w=300&q=80",
   },
   {
     id: "taycan",
@@ -49,6 +51,7 @@ export const popularModels: CarModel[] = [
     brand: "Porsche",
     year: 2023,
     type: "Electric",
+    thumbnail: "https://images.unsplash.com/photo-1619767886558-efdc259b6e1b?auto=format&fit=crop&w=300&q=80",
   },
   {
     id: "m3",
@@ -56,6 +59,7 @@ export const popularModels: CarModel[] = [
     brand: "BMW",
     year: 2023,
     type: "Sports Sedan",
+    thumbnail: "https://images.unsplash.com/photo-1607853554439-0069ec0f29b6?auto=format&fit=crop&w=300&q=80",
   },
   {
     id: "rs6",
@@ -63,5 +67,6 @@ export const popularModels: CarModel[] = [
     brand: "Audi",
     year: 2023,
     type: "Sports Wagon",
+    thumbnail: "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=300&q=80",
   },
 ];

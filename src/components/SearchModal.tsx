@@ -3,6 +3,7 @@ import { useKeyboard } from "@/hooks/useKeyboard";
 import { carBrands, popularModels, type CarBrand, type CarModel } from "@/data/cars";
 import { CarBrandCard } from "./CarBrandCard";
 import { CarModelCard } from "./CarModelCard";
+import { Search, Command } from "lucide-react";
 
 export const SearchModal = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,8 +54,9 @@ export const SearchModal = () => {
         onClick={() => setIsOpen(false)}
       />
       <div className="relative w-full max-w-2xl animate-modal-open">
-        <div className="bg-raycast-background border border-raycast-border rounded-xl shadow-2xl overflow-hidden">
-          <div className="p-3 border-b border-raycast-border">
+        <div className="overflow-hidden bg-raycast-background border border-raycast-border rounded-xl shadow-2xl">
+          <div className="flex items-center gap-3 p-3 border-b border-raycast-border">
+            <Search className="w-5 h-5 text-raycast-text-secondary" />
             <input
               ref={inputRef}
               type="text"
@@ -63,11 +65,15 @@ export const SearchModal = () => {
               placeholder="Search cars..."
               className="w-full bg-transparent text-raycast-text placeholder:text-raycast-text-secondary font-mono text-lg outline-none"
             />
+            <kbd className="hidden sm:flex items-center gap-1 px-2 py-1 text-xs rounded font-mono bg-raycast-card text-raycast-text-secondary">
+              <Command className="w-3 h-3" />
+              K
+            </kbd>
           </div>
           <div className="max-h-[60vh] overflow-y-auto">
             {filteredBrands.length > 0 && (
               <div className="p-3">
-                <h3 className="text-raycast-text-secondary text-sm font-medium mb-2">
+                <h3 className="text-raycast-text-secondary text-xs font-medium uppercase tracking-wider px-3 mb-2">
                   Car Brands
                 </h3>
                 <div className="grid grid-cols-2 gap-2">
@@ -87,7 +93,7 @@ export const SearchModal = () => {
             )}
             {filteredModels.length > 0 && (
               <div className="p-3">
-                <h3 className="text-raycast-text-secondary text-sm font-medium mb-2">
+                <h3 className="text-raycast-text-secondary text-xs font-medium uppercase tracking-wider px-3 mb-2">
                   Popular Models
                 </h3>
                 <div className="flex flex-col gap-2">
