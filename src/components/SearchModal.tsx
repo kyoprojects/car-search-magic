@@ -4,11 +4,13 @@ import { carBrands, popularModels, type CarBrand, type CarModel } from "@/data/c
 import { CarBrandCard } from "./CarBrandCard";
 import { CarModelCard } from "./CarModelCard";
 import { Search, Command } from "lucide-react";
+import { Skeleton } from "./ui/skeleton";
 
 export const SearchModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const filteredBrands = carBrands.filter((brand) =>
@@ -39,9 +41,16 @@ export const SearchModal = () => {
   useEffect(() => {
     if (isOpen) {
       inputRef.current?.focus();
+      // Simulate loading delay
+      setIsLoading(true);
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+      return () => clearTimeout(timer);
     } else {
       setSearch("");
       setSelectedIndex(0);
+      setIsLoading(false);
     }
   }, [isOpen]);
 
@@ -71,50 +80,96 @@ export const SearchModal = () => {
             </kbd>
           </div>
           <div className="max-h-[60vh] overflow-y-auto">
-            {filteredBrands.length > 0 && (
-              <div className="p-3">
-                <h3 className="text-raycast-text-secondary text-xs font-medium uppercase tracking-wider px-3 mb-2">
-                  Car Brands
-                </h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {filteredBrands.map((brand, index) => (
-                    <CarBrandCard
-                      key={brand.id}
-                      brand={brand}
-                      isSelected={index === selectedIndex}
-                      onClick={() => {
-                        console.log("Selected brand:", brand);
-                        setIsOpen(false);
-                      }}
-                    />
-                  ))}
+            {isLoading ? (
+              <>
+                <div className="p-3">
+                  <h3 className="text-raycast-text-secondary text-xs font-medium uppercase tracking-wider px-3 mb-2">
+                    Car Brands
+                  </h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div
+                        key={i}
+                        className="bg-raycast-card p-3 rounded-lg flex items-center gap-3"
+                      >
+                        <Skeleton className="w-8 h-8 rounded-md" />
+                        <Skeleton className="h-4 w-24" />
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-            {filteredModels.length > 0 && (
-              <div className="p-3">
-                <h3 className="text-raycast-text-secondary text-xs font-medium uppercase tracking-wider px-3 mb-2">
-                  Popular Models
-                </h3>
-                <div className="flex flex-col gap-2">
-                  {filteredModels.map((model, index) => (
-                    <CarModelCard
-                      key={model.id}
-                      model={model}
-                      isSelected={index + filteredBrands.length === selectedIndex}
-                      onClick={() => {
-                        console.log("Selected model:", model);
-                        setIsOpen(false);
-                      }}
-                    />
-                  ))}
+                <div className="p-3">
+                  <h3 className="text-raycast-text-secondary text-xs font-medium uppercase tracking-wider px-3 mb-2">
+                    Popular Models
+                  </h3>
+                  <div className="flex flex-col gap-2">
+                    {[1, 2, 3].map((i) => (
+                      <div
+                        key={i}
+                        className="bg-raycast-card p-3 rounded-lg flex items-center gap-3"
+                      >
+                        <Skeleton className="w-12 h-8 rounded-md" />
+                        <div className="flex flex-col gap-2 flex-1">
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-3 w-24" />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Skeleton className="h-4 w-12" />
+                          <Skeleton className="h-6 w-16 rounded-full" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-            {filteredBrands.length === 0 && filteredModels.length === 0 && (
-              <div className="p-8 text-center text-raycast-text-secondary">
-                No results found for "{search}"
-              </div>
+              </>
+            ) : (
+              <>
+                {filteredBrands.length > 0 && (
+                  <div className="p-3">
+                    <h3 className="text-raycast-text-secondary text-xs font-medium uppercase tracking-wider px-3 mb-2">
+                      Car Brands
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      {filteredBrands.map((brand, index) => (
+                        <CarBrandCard
+                          key={brand.id}
+                          brand={brand}
+                          isSelected={index === selectedIndex}
+                          onClick={() => {
+                            console.log("Selected brand:", brand);
+                            setIsOpen(false);
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {filteredModels.length > 0 && (
+                  <div className="p-3">
+                    <h3 className="text-raycast-text-secondary text-xs font-medium uppercase tracking-wider px-3 mb-2">
+                      Popular Models
+                    </h3>
+                    <div className="flex flex-col gap-2">
+                      {filteredModels.map((model, index) => (
+                        <CarModelCard
+                          key={model.id}
+                          model={model}
+                          isSelected={index + filteredBrands.length === selectedIndex}
+                          onClick={() => {
+                            console.log("Selected model:", model);
+                            setIsOpen(false);
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {filteredBrands.length === 0 && filteredModels.length === 0 && (
+                  <div className="p-8 text-center text-raycast-text-secondary">
+                    No results found for "{search}"
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
