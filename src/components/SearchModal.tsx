@@ -3,8 +3,14 @@ import { useKeyboard } from "@/hooks/useKeyboard";
 import { carBrands, popularModels, type CarBrand, type CarModel } from "@/data/cars";
 import { CarBrandCard } from "./CarBrandCard";
 import { CarModelCard } from "./CarModelCard";
-import { Search, Command } from "lucide-react";
+import { Search, Command, ArrowDown, ArrowUp, CornerDownLeft } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const SearchModal = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -171,6 +177,39 @@ export const SearchModal = () => {
                 )}
               </>
             )}
+          </div>
+          
+          {/* New Footer */}
+          <div className="border-t border-raycast-border p-2 flex justify-between items-center text-xs text-raycast-text-secondary">
+            <span className="font-medium">Korbach Performance Room</span>
+            <div className="flex items-center gap-3">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1">
+                      <ArrowUp className="w-3 h-3" />
+                      <ArrowDown className="w-3 h-3" />
+                      <span>to navigate</span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Use arrow keys to navigate</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1 ml-3">
+                      <CornerDownLeft className="w-3 h-3" />
+                      <span>to select</span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Press enter to select</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
         </div>
       </div>
