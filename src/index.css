@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+@import '@fontsource/inter/variable.css'; /* Use variable font for flexibility */
+body {
+  font-family: 'Inter', sans-serif;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -87,15 +92,5 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground;
   }
 }

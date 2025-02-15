@@ -40,3 +40,21 @@
 .read-the-docs {
   color: #888;
 }
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+@import '@fontsource/inter/variable.css'; /* Use variable font for flexibility */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+body {
+  font-family: 'Inter', sans-serif;
+}
