@@ -1,15 +1,10 @@
-
-import { supabase } from "@/integrations/supabase/client";
-import { CarBrand, CarModel } from "@/data/cars";
+import { supabase } from '@/integrations/supabase/client';
+import { CarBrand, CarModel } from '@/data/cars';
 
 export const fetchCarBrands = async (): Promise<CarBrand[]> => {
   try {
     // Get distinct brands from cars table
-    const { data, error } = await supabase
-      .from('cars')
-      .select('brand, make')
-      .not('brand', 'is', null)
-      .order('brand');
+    const { data, error } = await supabase.from('cars').select('brand, make').not('brand', 'is', null).order('brand');
 
     if (error) {
       console.error('Error fetching car brands:', error);
@@ -17,9 +12,7 @@ export const fetchCarBrands = async (): Promise<CarBrand[]> => {
     }
 
     // Transform the data to match our CarBrand interface
-    const uniqueBrands = Array.from(
-      new Set(data.map(car => car.brand))
-    ).map(brandName => {
+    const uniqueBrands = Array.from(new Set(data.map(car => car.brand))).map(brandName => {
       // Find the first car with this brand to get the make
       const car = data.find(c => c.brand === brandName);
       return {
@@ -39,10 +32,7 @@ export const fetchCarBrands = async (): Promise<CarBrand[]> => {
 
 export const fetchCarModels = async (): Promise<CarModel[]> => {
   try {
-    const { data, error } = await supabase
-      .from('cars')
-      .select('*')
-      .order('name');
+    const { data, error } = await supabase.from('cars').select('*').order('name');
 
     if (error) {
       console.error('Error fetching car models:', error);
@@ -56,7 +46,8 @@ export const fetchCarModels = async (): Promise<CarModel[]> => {
       brand: car.brand || '',
       year: parseInt(car.year || '2023'),
       type: 'Unknown', // We don't have type in the database, so using a default
-      thumbnail: car.thumbnail || 'https://placehold.co/300x200?text=No+Image'
+      thumbnail: car.thumbnail || 'https://placehold.co/300x200?text=No+Image',
+      model: car.model
     }));
   } catch (error) {
     console.error('Error in fetchCarModels:', error);
