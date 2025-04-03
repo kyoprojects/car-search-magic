@@ -1,24 +1,57 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { useKeyboard } from '@/hooks/useKeyboard';
-import { carBrands, popularModels, type CarBrand, type CarModel } from '@/data/cars';
+import { type CarBrand, type CarModel } from '@/data/cars';
 import { CarBrandCard } from './CarBrandCard';
 import { CarModelCard } from './CarModelCard';
 import { Search, Command, ArrowDown, ArrowUp, CornerDownLeft } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { fetchCarBrands, fetchCarModels } from '@/services/carService';
 
 export const SearchModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [brands, setBrands] = useState<CarBrand[]>([]);
+  const [models, setModels] = useState<CarModel[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const filteredBrands = carBrands.filter(brand => brand.name.toLowerCase().includes(search.toLowerCase()));
+  const filteredBrands = brands.filter(brand => 
+    brand.name.toLowerCase().includes(search.toLowerCase())
+  );
 
-  const filteredModels = popularModels.filter(model => model.name.toLowerCase().includes(search.toLowerCase()) || model.brand.toLowerCase().includes(search.toLowerCase()));
+  const filteredModels = models.filter(model => 
+    model.name.toLowerCase().includes(search.toLowerCase()) || 
+    model.brand.toLowerCase().includes(search.toLowerCase())
+  );
 
   const allItems = [...filteredBrands, ...filteredModels];
+
+  // Fetch data from Supabase
+  useEffect(() => {
+    if (isOpen) {
+      const loadData = async () => {
+        setIsLoading(true);
+        try {
+          const [brandsData, modelsData] = await Promise.all([
+            fetchCarBrands(),
+            fetchCarModels()
+          ]);
+          
+          setBrands(brandsData);
+          setModels(modelsData);
+        } catch (error) {
+          console.error('Error loading car data:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
+      loadData();
+    }
+  }, [isOpen]);
 
   useKeyboard({
     isOpen,
@@ -30,23 +63,18 @@ export const SearchModal = () => {
       const selected = allItems[selectedIndex];
       console.log('Selected:', selected);
       setIsOpen(false);
-      window.location.href = `https://korbach-configurator.webflow.io/?model=competition`;
+      if (selected) {
+        window.location.href = `https://korbach-configurator.webflow.io/?model=${selected.id}`;
+      }
     }
   });
 
   useEffect(() => {
     if (isOpen) {
       inputRef.current?.focus();
-      // Simulate loading delay
-      setIsLoading(true);
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, 1000);
-      return () => clearTimeout(timer);
     } else {
       setSearch('');
       setSelectedIndex(0);
-      setIsLoading(false);
     }
   }, [isOpen]);
 
