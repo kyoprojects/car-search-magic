@@ -1,3 +1,4 @@
+
 import { SearchModal } from "@/components/SearchModal";
 
 const Index = () => {
@@ -6,8 +7,7 @@ const Index = () => {
       <div className="max-w-md mx-auto text-center">
         <h1 className="text-raycast-text text-3xl font-bold mb-4">Car Search</h1>
         <p className="text-raycast-text-secondary mb-8">
-          Press <kbd className="px-2 py-1 bg-raycast-card rounded">⌘</kbd> +{" "}
-          <kbd className="px-2 py-1 bg-raycast-card rounded">K</kbd> to open search
+          Select a car to configure
         </p>
       </div>
       <SearchModal />

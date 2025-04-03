@@ -1,16 +1,15 @@
 
 import { useState, useRef, useEffect } from 'react';
-import { useKeyboard } from '@/hooks/useKeyboard';
 import { type CarBrand, type CarModel } from '@/data/cars';
 import { CarBrandCard } from './CarBrandCard';
 import { CarModelCard } from './CarModelCard';
-import { Search, Command, ArrowDown, ArrowUp, CornerDownLeft } from 'lucide-react';
+import { Search, ArrowDown, ArrowUp, CornerDownLeft } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { fetchCarBrands, fetchCarModels } from '@/services/carService';
 
 export const SearchModal = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true); // Modal is always open by default
   const [search, setSearch] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,6 +27,28 @@ export const SearchModal = () => {
   );
 
   const allItems = [...filteredBrands, ...filteredModels];
+
+  // Function to send postMessage to parent window
+  const sendSelectedCarToParent = (item: CarBrand | CarModel) => {
+    // Determine if it's a brand or model by checking for properties specific to models
+    const isModel = 'year' in item;
+    
+    try {
+      window.parent.postMessage({
+        type: 'selectCar',
+        data: item
+      }, '*'); // Using * for now, can be restricted to specific origins later
+      
+      console.log(`Sent ${isModel ? 'model' : 'brand'} data to parent:`, item);
+    } catch (error) {
+      console.error('Error sending postMessage:', error);
+    }
+  };
+
+  // Handle selection of an item (either by click or enter key)
+  const handleSelection = (item: CarBrand | CarModel) => {
+    sendSelectedCarToParent(item);
+  };
 
   // Fetch data from Supabase
   useEffect(() => {
@@ -53,22 +74,35 @@ export const SearchModal = () => {
     }
   }, [isOpen]);
 
-  useKeyboard({
-    isOpen,
-    onOpen: () => setIsOpen(true),
-    onClose: () => setIsOpen(false),
-    onArrowUp: () => setSelectedIndex(prev => Math.max(0, prev - 1)),
-    onArrowDown: () => setSelectedIndex(prev => Math.min(allItems.length - 1, prev + 1)),
-    onEnter: () => {
-      const selected = allItems[selectedIndex];
-      console.log('Selected:', selected);
-      setIsOpen(false);
-      if (selected) {
-        window.location.href = `https://korbach-configurator.webflow.io/?model=${selected.id}`;
-      }
-    }
-  });
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!isOpen) return;
 
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        setSelectedIndex(prev => Math.max(0, prev - 1));
+      }
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        setSelectedIndex(prev => Math.min(allItems.length - 1, prev + 1));
+      }
+
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const selected = allItems[selectedIndex];
+        if (selected) {
+          handleSelection(selected);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, allItems, selectedIndex]);
+
+  // Focus the input when modal opens
   useEffect(() => {
     if (isOpen) {
       inputRef.current?.focus();
@@ -82,15 +116,12 @@ export const SearchModal = () => {
 
   return (
     <div className='fixed inset-0 z-50 flex items-start justify-center pt-[20vh]'>
-      <div className='fixed inset-0 bg-black/40 backdrop-blur-sm animate-fade-in' onClick={() => setIsOpen(false)} />
+      <div className='fixed inset-0 bg-black/40 backdrop-blur-sm animate-fade-in' />
       <div className='relative w-full max-w-2xl animate-modal-open'>
         <div className='overflow-hidden bg-raycast-background border border-raycast-border rounded-xl shadow-2xl'>
           <div className='flex items-center gap-3 p-3 border-b border-raycast-border'>
             <Search className='w-5 h-5 text-raycast-text-secondary' />
             <input ref={inputRef} type='text' value={search} onChange={e => setSearch(e.target.value)} placeholder='Search cars...' className='w-full bg-transparent text-raycast-text placeholder:text-raycast-text-secondary font-sans text-lg outline-none' />
-            <kbd className='hidden sm:flex items-center gap-1 px-2 py-1 text-xs rounded font-mono bg-raycast-card text-raycast-text-secondary'>
-              <Command className='w-3 h-3' />K
-            </kbd>
           </div>
           <div className='max-h-[60vh] overflow-y-auto'>
             {isLoading ? (
@@ -136,10 +167,7 @@ export const SearchModal = () => {
                           key={brand.id}
                           brand={brand}
                           isSelected={index === selectedIndex}
-                          onClick={() => {
-                            console.log('Selected brand:', brand);
-                            setIsOpen(false);
-                          }}
+                          onClick={() => handleSelection(brand)}
                         />
                       ))}
                     </div>
@@ -154,10 +182,7 @@ export const SearchModal = () => {
                           key={model.id}
                           model={model}
                           isSelected={index + filteredBrands.length === selectedIndex}
-                          onClick={() => {
-                            console.log('Selected model:', model);
-                            window.location.href = `https://korbach-configurator.webflow.io/?model=${model.id}`;
-                          }}
+                          onClick={() => handleSelection(model)}
                         />
                       ))}
                     </div>
@@ -168,7 +193,7 @@ export const SearchModal = () => {
             )}
           </div>
 
-          {/* New Footer */}
+          {/* Footer */}
           <div className='border-t border-raycast-border px-4 py-3 flex justify-between items-center text-xs text-raycast-text-secondary'>
             <div className='flex items-center gap-2'>
               <img src='https://cdn.prod.website-files.com/6506f5c591feec8652f59597/653185e58d938f0b388d7989_star-webclip.png' alt='Logo' className='w-4 h-4' />
