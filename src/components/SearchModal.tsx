@@ -161,7 +161,7 @@ export const SearchModal = () => {
   if (!isOpen) return null;
 
   return (
-    <div className='fixed inset-0 z-50 flex items-start justify-center pt-[20vh]'>
+    <div className='fixed inset-0 z-50 flex items-start justify-center'>
       <div className='relative w-full max-w-2xl animate-modal-open'>
         <div className='overflow-hidden bg-raycast-background border border-raycast-border rounded-xl shadow-2xl'>
           <div className='flex items-center gap-3 p-3 border-b border-raycast-border'>
