@@ -11,15 +11,27 @@ export const fetchCarBrands = async (): Promise<CarBrand[]> => {
       throw new Error(error.message);
     }
 
+    // Get brand logos from makes table
+    const { data: makes, error: makesError } = await supabase.from('makes').select('*').returns<{ id: number; make: string; thumbnail: string | null }[]>();
+
+    if (makesError) {
+      console.error('Error fetching makes:', makesError);
+      // Don't throw here, we'll just use fallback logos
+    }
+
+    // Create a map of make name to thumbnail
+    const makeLogoMap = new Map(makes?.map(make => [make.make.toLowerCase().trim(), make.thumbnail]) || []);
+
     // Transform the data to match our CarBrand interface
     const uniqueBrands = Array.from(new Set(data.map(car => car.brand))).map(brandName => {
       // Find the first car with this brand to get the make
       const car = data.find(c => c.brand === brandName);
+      const brandLogo = makeLogoMap.get(brandName?.toLowerCase().trim() || '');
+
       return {
         id: brandName?.toLowerCase() || '',
         name: brandName || '',
-        // Using a placeholder logo since we don't have logos in the database
-        logo: `https://placehold.co/100x100?text=${brandName?.charAt(0) || 'X'}`
+        logo: brandLogo || `https://placehold.co/100x100?text=${brandName?.charAt(0) || 'X'}`
       };
     });
 
