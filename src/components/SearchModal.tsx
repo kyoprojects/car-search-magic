@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { fetchCarBrands, fetchCarModels } from '@/services/carService';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export const SearchModal = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -19,6 +20,7 @@ export const SearchModal = () => {
   const [selectedBrand, setSelectedBrand] = useState<CarBrand | null>(null);
   const [showAllBrands, setShowAllBrands] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isMobile = useIsMobile();
 
   const filteredBrands = brands.filter(brand => brand.name.toLowerCase().includes(search.toLowerCase()));
 
@@ -47,8 +49,6 @@ export const SearchModal = () => {
         },
         '*'
       ); // Using * for now, can be restricted to specific origins later
-
-      console.log(`Sent ${isModel ? 'model' : 'brand'} data to parent:`, item);
     } catch (error) {
       console.error('Error sending postMessage:', error);
     }
@@ -161,16 +161,16 @@ export const SearchModal = () => {
   if (!isOpen) return null;
 
   return (
-    <div className='fixed inset-0 z-50 flex items-start justify-center'>
-      <div className='relative w-full max-w-2xl animate-modal-open'>
-        <div className='overflow-hidden bg-raycast-background border border-raycast-border rounded-xl shadow-2xl'>
+    <div className='fixed inset-0 z-50 flex items-start justify-center h-full'>
+      <div className={`relative w-full ${isMobile ? 'px-4 max-w-full' : 'max-w-2xl'} animate-modal-open h-full`}>
+        <div className='overflow-hidden bg-raycast-background border border-raycast-border rounded-xl shadow-2xl h-full flex flex-col'>
           <div className='flex items-center gap-3 p-3 border-b border-raycast-border'>
             <Search className='w-5 h-5 text-raycast-text-secondary' />
             <div className='flex items-center gap-3 flex-1'>
               {selectedBrand && (
                 <div
                   onClick={clearBrandFilter}
-                  className='bg-[#ffffff0a] hover:bg-[#ffffff14] text-[#ffffffb3] cursor-pointer rounded-md h-7 px-2 flex items-center gap-2 text-sm font-normal shrink-0'>
+                  className='bg-[#ffffff12] hover:bg-[#ffffff1a] text-[#ffffffb3] cursor-pointer rounded-md h-7 px-2 flex items-center gap-2 text-xs font-normal shrink-0'>
                   <img src={selectedBrand.logo} alt={selectedBrand.name} className='w-4 h-4 object-contain' />
                   {selectedBrand.name}
                   <X className='h-3.5 w-3.5 text-[#ffffff80]' />
@@ -192,7 +192,7 @@ export const SearchModal = () => {
               />
             </div>
           </div>
-          <div className='max-h-[60vh] overflow-y-auto'>
+          <div className='flex-1 overflow-y-auto'>
             {isLoading ? (
               <>
                 <div className='p-3'>
@@ -251,34 +251,36 @@ export const SearchModal = () => {
               <img src='https://cdn.prod.website-files.com/6506f5c591feec8652f59597/653185e58d938f0b388d7989_star-webclip.png' alt='Logo' className='w-4 h-4' />
               <span className='font-medium'>Korbach Performance Room</span>
             </div>
-            <div className='flex items-center gap-3'>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className='flex items-center gap-1'>
-                      <ArrowUp className='w-3 h-3' />
-                      <ArrowDown className='w-3 h-3' />
-                      <span>to navigate</span>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Use arrow keys to navigate</p>
-                  </TooltipContent>
-                </Tooltip>
+            {!isMobile && (
+              <div className='flex items-center gap-3'>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className='flex items-center gap-1'>
+                        <ArrowUp className='w-3 h-3' />
+                        <ArrowDown className='w-3 h-3' />
+                        <span>to navigate</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Use arrow keys to navigate</p>
+                    </TooltipContent>
+                  </Tooltip>
 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className='flex items-center gap-1 ml-3'>
-                      <CornerDownLeft className='w-3 h-3' />
-                      <span>to select</span>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Press enter to select</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className='flex items-center gap-1 ml-3'>
+                        <CornerDownLeft className='w-3 h-3' />
+                        <span>to select</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Press enter to select</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            )}
           </div>
         </div>
       </div>
