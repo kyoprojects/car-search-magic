@@ -97,6 +97,34 @@ export const SearchModal = () => {
     }
   }, [isOpen]);
 
+  // Listen for postMessage events from parent window
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      // Validate origin if needed
+      // if (event.origin !== "https://example.com") return;
+
+      const { type, action } = event.data || {};
+
+      if (type === 'searchModal') {
+        switch (action) {
+          case 'focusInput':
+            // Focus the search input when requested by parent
+            inputRef.current?.focus();
+            break;
+          default:
+            break;
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+
+    // Clean up event listener
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, []);
+
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -148,10 +176,11 @@ export const SearchModal = () => {
     setSelectedIndex(0);
   }, [search, selectedBrand]);
 
-  // Focus the input when modal opens
+  // Handle search input focus via postMessage
   useEffect(() => {
     if (isOpen) {
-      inputRef.current?.focus();
+      // Don't auto-focus, wait for parent window command
+      // Reset state when modal closes
     } else {
       setSearch('');
       setSelectedIndex(0);
