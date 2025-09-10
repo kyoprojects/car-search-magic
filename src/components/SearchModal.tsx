@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { type CarBrand, type CarModel } from '@/data/cars';
 import { CarBrandCard } from './CarBrandCard';
 import { CarModelCard } from './CarModelCard';
@@ -34,7 +34,9 @@ export const SearchModal = () => {
   });
 
   // Only include brands in allItems if no brand is selected
-  const allItems = selectedBrand ? filteredModels : [...filteredBrands, ...filteredModels];
+  const allItems = useMemo(() => {
+    return selectedBrand ? filteredModels : [...filteredBrands, ...filteredModels];
+  }, [selectedBrand, filteredBrands, filteredModels]);
 
   // Function to send postMessage to parent window
   const sendSelectedCarToParent = (item: CarBrand | CarModel) => {
@@ -66,9 +68,9 @@ export const SearchModal = () => {
   };
 
   // Handle selection of a model
-  const handleModelSelection = (model: CarModel) => {
+  const handleModelSelection = useCallback((model: CarModel) => {
     sendSelectedCarToParent(model);
-  };
+  }, []);
 
   // Clear brand filter
   const clearBrandFilter = () => {
@@ -169,7 +171,7 @@ export const SearchModal = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, allItems, selectedIndex, selectedBrand, search]);
+  }, [isOpen, allItems, selectedIndex, selectedBrand, search, handleModelSelection]);
 
   // Reset selected index when filtered items change
   useEffect(() => {
@@ -228,9 +230,26 @@ export const SearchModal = () => {
                   <h3 className='text-raycast-text-secondary text-xs font-medium uppercase tracking-wider px-3 mb-2'>Car Brands</h3>
                   <div className='grid grid-cols-3 gap-2'>
                     {[1, 2, 3, 4, 5, 6].map(i => (
-                      <div key={i} className='bg-raycast-card p-3 rounded-lg flex items-center gap-3'>
-                        <Skeleton className='w-8 h-8 rounded-md bg-raycast-accent' />
+                      <div key={i} className='bg-raycast-card p-2 rounded-lg flex items-center gap-2 min-h-[40px]'>
+                        <Skeleton className='w-5 h-5 rounded-md bg-raycast-accent' />
                         <Skeleton className='h-4 w-24 bg-raycast-accent' />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className='p-3'>
+                  <h3 className='text-raycast-text-secondary text-xs font-medium uppercase tracking-wider px-3 mb-2'>Popular Models</h3>
+                  <div className='flex flex-col gap-2'>
+                    {[1, 2, 3, 4].map(i => (
+                      <div key={i} className='bg-raycast-card p-2 rounded-lg flex items-center gap-3 min-h-[48px]'>
+                        <Skeleton className='w-12 h-8 rounded bg-raycast-hover' />
+                        <div className='flex flex-col flex-1'>
+                          <Skeleton className='h-4 w-24 bg-raycast-accent' />
+                        </div>
+                        <div className='flex items-center gap-2 ml-2'>
+                          <Skeleton className='h-4 w-8 bg-raycast-accent' />
+                          <Skeleton className='h-6 w-16 rounded-full bg-[#444]' />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -243,7 +262,9 @@ export const SearchModal = () => {
                     <h3 className='text-raycast-text-secondary text-xs font-medium uppercase tracking-wider px-3 mb-2'>Car Brands</h3>
                     <div className='grid grid-cols-3 gap-2'>
                       {visibleBrands.map((brand, index) => (
-                        <CarBrandCard key={brand.id} brand={brand} isSelected={index === selectedIndex} onClick={() => handleBrandSelection(brand)} />
+                        <div key={brand.id} className='min-h-[40px]'>
+                          <CarBrandCard brand={brand} isSelected={index === selectedIndex} onClick={() => handleBrandSelection(brand)} />
+                        </div>
                       ))}
                     </div>
                     {hasMoreBrands && !showAllBrands && (
@@ -259,12 +280,13 @@ export const SearchModal = () => {
                     <h3 className='text-raycast-text-secondary text-xs font-medium uppercase tracking-wider px-3 mb-2'>{selectedBrand ? `${selectedBrand.name} Models` : 'Popular Models'}</h3>
                     <div className='flex flex-col gap-2'>
                       {filteredModels.map((model, index) => (
-                        <CarModelCard
-                          key={model.id}
-                          model={model}
-                          isSelected={!selectedBrand ? index + filteredBrands.length === selectedIndex : index === selectedIndex}
-                          onClick={() => handleModelSelection(model)}
-                        />
+                        <div key={model.id} className='min-h-[48px]'>
+                          <CarModelCard
+                            model={model}
+                            isSelected={!selectedBrand ? index + filteredBrands.length === selectedIndex : index === selectedIndex}
+                            onClick={() => handleModelSelection(model)}
+                          />
+                        </div>
                       ))}
                     </div>
                   </div>

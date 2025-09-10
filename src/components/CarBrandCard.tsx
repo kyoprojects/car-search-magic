@@ -9,7 +9,9 @@ interface CarBrandCardProps {
 
 export const CarBrandCard = ({ brand, isSelected, onClick }: CarBrandCardProps) => {
   return (
-    <div onClick={onClick} className={`group relative flex items-center p-2 rounded-lg cursor-pointer transition-all ${isSelected ? 'bg-raycast-accent' : 'bg-raycast-card hover:bg-raycast-hover'}`}>
+    <div
+      onClick={onClick}
+      className={`group relative flex items-center p-2 rounded-lg cursor-pointer transition-all min-h-[40px] ${isSelected ? 'bg-raycast-accent' : 'bg-raycast-card hover:bg-raycast-hover'}`}>
       <div className='flex items-center gap-2 flex-1 min-w-0'>
         <img src={brand.logo} alt={brand.name} className='w-5 h-5 object-contain flex-shrink-0' />
         <span className='text-raycast-text font-medium truncate'>{brand.name}</span>

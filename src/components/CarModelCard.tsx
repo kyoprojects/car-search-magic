@@ -17,7 +17,9 @@ export const CarModelCard = ({ model, isSelected, onClick }: CarModelCardProps) 
   };
 
   return (
-    <div onClick={onClick} className={`group flex items-center p-2 rounded-lg cursor-pointer transition-all ${isSelected ? 'bg-raycast-accent' : 'bg-raycast-card hover:bg-raycast-hover'}`}>
+    <div
+      onClick={onClick}
+      className={`group flex items-center p-2 rounded-lg cursor-pointer transition-all min-h-[48px] ${isSelected ? 'bg-raycast-accent' : 'bg-raycast-card hover:bg-raycast-hover'}`}>
       <div className='flex items-center gap-3 flex-1 min-w-0'>
         <div className='w-12 h-8 flex-shrink-0 rounded bg-raycast-hover overflow-hidden'>
           <div className='w-full h-full p-0.5'>
